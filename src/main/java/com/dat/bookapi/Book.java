@@ -4,7 +4,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
+@Entity
 public class Book{
     @NotBlank
     private String title;
@@ -19,7 +24,9 @@ public class Book{
     private Double price;
     @NotNull
     private Boolean available;
-    private int nextId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     public Book() {
     }
@@ -33,7 +40,7 @@ public class Book{
     }
 
     public Integer getId() {
-        return nextId;
+        return id;
     }
 
     public String getTitle() {
@@ -57,7 +64,7 @@ public class Book{
     }
 
     public void setId(Integer id){
-        this.nextId = id;
+        this.id = id;
     }
 
     public void setTitle(String title){

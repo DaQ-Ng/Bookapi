@@ -1,54 +1,46 @@
 package com.dat.bookapi;
 
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class BookService{
-    private int nextId = 1;
-    private ArrayList<Book> books = new ArrayList<>();
+    private final BookRepository bookRepository;
 
-    public BookService(){
+    public BookService(BookRepository bookRepository){
+        this.bookRepository = bookRepository;
         // Initialize some books for demonstration purposes
-        addBook(new Book("Title1", "Author1", 2020, 19.99, true));
-        addBook(new Book("Title2", "Author2", 2021, 29.99, false));
+        if(bookRepository.count() == 0){
+            addBook(new Book("Title1", "Author1", 2020, 19.99, true));
+            addBook(new Book("Title2", "Author2", 2021, 29.99, false));
+        }
     }
 
-    public ArrayList<Book> getAllBooks(){
-        return books;
+    public List<Book> getAllBooks(){
+        return bookRepository.findAll();
     }
 
     public Book addBook(Book book){
-        book.setId(nextId++);
-        books.add(book);
-        return book;
+        return bookRepository.save(book);
     }
 
     public Book getBookById(int id){
-        for(int index = 0; index < books.size(); index++){
-            if(books.get(index).getId() == id){
-                return books.get(index);
-            }
-        }
-        return null; // Book not found
+        return bookRepository.findById(id).orElse(null);
     }
 
     public Book deleteBook(int id){
-        for(int index = 0; index < books.size(); index++){
-            if(books.get(index).getId() == id){
-                return books.remove(index);
-            }
+        Book bookToDelete = bookRepository.findById(id).orElse(null);
+        if(bookToDelete != null){
+            bookRepository.deleteById(id);
+            return bookToDelete;
         }
         return null; // Book not found
     }
 
     public Book updateBook(int id, Book updatedBook){
-        for(int index = 0; index < books.size(); index++){
-            if(books.get(index).getId() == id){
-                books.set(index, updatedBook);
-                books.get(index).setId(id);
-                return updatedBook;
-            }
+        if(bookRepository.existsById(id)){
+            updatedBook.setId(id);
+            return bookRepository.save(updatedBook);
         }
         return null; // Book not found
     }
