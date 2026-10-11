@@ -9,11 +9,6 @@ public class BookService{
 
     public BookService(BookRepository bookRepository){
         this.bookRepository = bookRepository;
-        // Initialize some books for demonstration purposes
-        if(bookRepository.count() == 0){
-            addBook(new Book("Title1", "Author1", 2020, 19.99, true));
-            addBook(new Book("Title2", "Author2", 2021, 29.99, false));
-        }
     }
 
     public List<Book> getAllBooks(){
