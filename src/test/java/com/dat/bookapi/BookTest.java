@@ -13,5 +13,5 @@ class BookTest{
         assertEquals(2020, book.getYear());
         assertEquals(9.99, book.getPrice());
         assertEquals(true, book.isAvailable());
-    }
+    }   
 }
