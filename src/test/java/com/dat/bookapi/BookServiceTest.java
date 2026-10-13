@@ -62,4 +62,27 @@ class BookServiceTest{
         assertEquals(bookToDelete, result);
         verify(repo, times(1)).deleteById(1);
     }
+
+    @Test
+    void getMissingIdReturnNull(){
+        BookRepository repo = mock(BookRepository.class);
+        when(repo.findById(99)).thenReturn(Optional.empty());
+        BookService service = new BookService(repo);
+
+        Book result = service.getBookById(99);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getExistingIdReturnsBook(){
+        BookRepository repo = mock(BookRepository.class);
+        Book bookToGet = new Book("Title", "Author", 2020, 9.99, true);
+        when(repo.findById(1)).thenReturn(Optional.of(bookToGet));
+        BookService service = new BookService(repo);
+
+        Book result = service.getBookById(1);
+
+        assertEquals(bookToGet, result);
+    }
 }
