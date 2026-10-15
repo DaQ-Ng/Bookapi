@@ -85,4 +85,15 @@ class BookServiceTest{
 
         assertEquals(bookToGet, result);
     }
+
+    @Test
+    void addBookIgnoresIdFromBody(){
+        BookRepository repo = mock(BookRepository.class);
+        Book bookToAdd = new Book("Title", "Author", 2020, 9.99, true);
+        bookToAdd.setId(5);
+        BookService service = new BookService(repo);
+
+        Book result = service.addBook(bookToAdd);
+        assertNull(bookToAdd.getId());
+    }
 }
