@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 public class Book{
@@ -27,6 +29,9 @@ public class Book{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private User seller;
 
     public Book() {
     }
@@ -59,6 +64,10 @@ public class Book{
         return price;
     }
 
+    public User getSeller(){
+        return seller;
+    }
+
     public Boolean isAvailable() {
         return available;
     }
@@ -85,5 +94,9 @@ public class Book{
 
     public void setAvailable(Boolean available){
         this.available = available;
+    }
+
+    public void setSeller(User seller){
+        this.seller = seller;
     }
 }
