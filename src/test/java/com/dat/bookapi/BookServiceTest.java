@@ -93,7 +93,7 @@ class BookServiceTest{
         bookToAdd.setId(5);
         BookService service = new BookService(repo);
 
-        Book result = service.addBook(bookToAdd);
+        Book result = service.addBook(bookToAdd); //There’s no Postgres, so its save does nothing and nobody assigns an id.
         assertNull(bookToAdd.getId());
     }
 }
