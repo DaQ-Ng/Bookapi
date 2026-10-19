@@ -25,7 +25,7 @@ public class Order{
     private Book purchasedBook;
     @NotNull
     @PositiveOrZero
-    private double price;
+    private Double price;
     private LocalDateTime createdAt;
 
     public Order(){}

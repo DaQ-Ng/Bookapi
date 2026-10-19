@@ -29,9 +29,12 @@ public class Book{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private User seller;
+    @ManyToOne //what kind of link this field is: many books (this class) → one user (this field’s type).
+    @JoinColumn(name = "seller_id") //where that link is stored in books: a column called seller_id that holds the user’s id.
+    private User seller; 
+
+    //@ManyToOne tells JPA “this field is a link to another entity, so save its @Id, not the whole object.”
+     //@JoinColumn(name = "seller_id") tells JPA which column to write that id into.
 
     public Book() {
     }
