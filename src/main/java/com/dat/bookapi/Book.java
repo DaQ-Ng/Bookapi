@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Version;
 
 @Entity
 public class Book{
@@ -32,6 +33,8 @@ public class Book{
     @ManyToOne //what kind of link this field is: many books (this class) → one user (this field’s type).
     @JoinColumn(name = "seller_id") //where that link is stored in books: a column called seller_id that holds the user’s id.
     private User seller; 
+    @Version
+    private Integer version;
 
     //@ManyToOne tells JPA “this field is a link to another entity, so save its @Id, not the whole object.”
      //@JoinColumn(name = "seller_id") tells JPA which column to write that id into.

@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.http.HttpStatus;
 import java.util.Map;
 import java.util.HashMap;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 
 @RestControllerAdvice
@@ -24,5 +25,10 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<String> handleOptimisticFailureException(ObjectOptimisticLockingFailureException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Book was just bought by someone else");
     }
 }
