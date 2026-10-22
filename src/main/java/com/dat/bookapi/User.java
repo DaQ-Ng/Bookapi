@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -18,6 +19,7 @@ public class User{
     @NotBlank
     private String email;
     @NotBlank
+    @JsonIgnore
     private String password;
 
     public User(){}
