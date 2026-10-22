@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -22,8 +23,8 @@ public class BookController{
     }
     
     @GetMapping("/books")
-    public List<Book> getBooks(){
-        return bookService.getAllBooks();
+    public List<Book> getBooks(@RequestParam(defaultValue = "") String title){
+        return bookService.searchBooks(title);
     }
 
     @GetMapping("/books/{id}")

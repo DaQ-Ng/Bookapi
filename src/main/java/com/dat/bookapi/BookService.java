@@ -40,4 +40,8 @@ public class BookService{
         }
         return null; // Book not found
     }
+
+    public List<Book> searchBooks(String title){
+        return bookRepository.findByTitleContainingIgnoreCaseAndAvailableTrue(title);
+    }
 }
