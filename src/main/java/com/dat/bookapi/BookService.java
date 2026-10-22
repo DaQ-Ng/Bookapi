@@ -2,6 +2,8 @@ package com.dat.bookapi;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class BookService{
@@ -41,7 +43,7 @@ public class BookService{
         return null; // Book not found
     }
 
-    public List<Book> searchBooks(String title){
-        return bookRepository.findByTitleContainingIgnoreCaseAndAvailableTrue(title);
+    public Page<Book> searchBooks(String title, Pageable pageable){
+        return bookRepository.findByTitleContainingIgnoreCaseAndAvailableTrue(title, pageable);
     }
 }

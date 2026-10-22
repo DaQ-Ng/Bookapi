@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @RestController
@@ -23,8 +25,8 @@ public class BookController{
     }
     
     @GetMapping("/books")
-    public List<Book> getBooks(@RequestParam(defaultValue = "") String title){
-        return bookService.searchBooks(title);
+    public Page<Book> getBooks(@RequestParam(defaultValue = "") String title, Pageable pageable){
+        return bookService.searchBooks(title, pageable);
     }
 
     @GetMapping("/books/{id}")

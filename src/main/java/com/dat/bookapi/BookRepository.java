@@ -1,9 +1,8 @@
 package com.dat.bookapi;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookRepository extends JpaRepository<Book, Integer>{
-    //Yes, it’s empty. All the methods come from JpaRepository.
-    
-    List<Book> findByTitleContainingIgnoreCaseAndAvailableTrue(String title);
+    Page<Book> findByTitleContainingIgnoreCaseAndAvailableTrue(String title, Pageable pageable);
 }
