@@ -2,6 +2,8 @@ package com.dat.bookapi;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService{
@@ -18,5 +20,13 @@ public class UserService{
         user.setId(null);
         user.setPassword(passwordEncoder.encode(password));
         return userRepository.save(user);
+    }
+
+    public User login(LoginRequest request){
+        User user = userRepository.findByEmailIgnoreCase(request.getEmail()).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password."));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password.");
+        }
+        return user;
     }
 }
