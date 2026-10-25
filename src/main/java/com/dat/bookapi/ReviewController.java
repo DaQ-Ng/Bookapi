@@ -24,4 +24,6 @@ public class ReviewController{
     public List<Review> getReviews(){
         return reviewService.getAllReview();
     }
+
+    
 }

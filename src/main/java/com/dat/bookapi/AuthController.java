@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 public class AuthController{
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService){
+    public AuthController(UserService userService, JwtService jwtService){
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/auth/register")
@@ -19,7 +21,9 @@ public class AuthController{
     }
 
     @PostMapping("/auth/login")
-    public User login(@Valid @RequestBody LoginRequest login){
-        return userService.login(login);
+    public LoginResponse login(@Valid @RequestBody LoginRequest login){
+        User user = userService.login(login);
+        String token = jwtService.generateToken(user.getEmail());
+        return new LoginResponse(token);
     }
 }
