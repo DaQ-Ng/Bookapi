@@ -37,6 +37,6 @@ class BookControllerTest{
 
         mockMvc.perform(post("/books").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isBadRequest());
 
-        verify(bookService,never()).addBook(any());
+        verify(bookService,never()).addBook(any(), any());
     }
 }

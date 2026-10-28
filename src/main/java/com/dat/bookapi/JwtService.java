@@ -24,4 +24,15 @@ public class JwtService {
         .signWith(key)
         .compact();
     }
+
+    // checks the stamp (signature) + expiry, then reads "sub" out of the payload
+    // throws JwtException if the token is fake, changed, or expired
+    public String extractEmail(String token){
+        return Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getSubject();
+    }
 }

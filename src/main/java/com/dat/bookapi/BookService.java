@@ -4,20 +4,26 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class BookService{
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
-    public BookService(BookRepository bookRepository){
+    public BookService(BookRepository bookRepository, UserRepository userRepository){
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Book> getAllBooks(){
         return bookRepository.findAll();
     }
 
-    public Book addBook(Book book){
+    public Book addBook(Book book, String email){
+        User user = userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist"));
+        book.setSeller(user);
         book.setId(null);
         return bookRepository.save(book);
     }

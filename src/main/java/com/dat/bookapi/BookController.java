@@ -14,6 +14,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.security.Principal;
 
 
 @RestController
@@ -39,8 +40,8 @@ public class BookController{
     }
 
     @PostMapping("/books")
-    public Book addBook(@Valid @RequestBody Book book){
-        return bookService.addBook(book);
+    public Book addBook(@Valid @RequestBody Book book, Principal principal){
+        return bookService.addBook(book, principal.getName());
     }
 
     @DeleteMapping("/books/{id}")
