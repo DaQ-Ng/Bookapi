@@ -44,12 +44,18 @@ public class BookService{
         return bookToDelete;
     }
 
-    public Book updateBook(int id, Book updatedBook){
-        if(bookRepository.existsById(id)){
-            updatedBook.setId(id);
-            return bookRepository.save(updatedBook);
+    public Book updateBook(int id, Book updatedBook, String email){
+        Book bookToUpdate = bookRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book does not exist"));
+        if(!bookToUpdate.getSeller().getEmail().equalsIgnoreCase(email)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only edit your own books.");
         }
-        return null; // Book not found
+        // copy only the fields a seller may change; id, seller and version stay from the DB
+        bookToUpdate.setTitle(updatedBook.getTitle());
+        bookToUpdate.setAuthor(updatedBook.getAuthor());
+        bookToUpdate.setYear(updatedBook.getYear());
+        bookToUpdate.setPrice(updatedBook.getPrice());
+        bookToUpdate.setAvailable(updatedBook.isAvailable());
+        return bookRepository.save(bookToUpdate);
     }
 
     public Page<Book> searchBooks(String title, Pageable pageable){

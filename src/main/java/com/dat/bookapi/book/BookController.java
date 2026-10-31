@@ -50,11 +50,7 @@ public class BookController{
     }
 
     @PutMapping("/books/{id}")
-    public Book updateBook(@PathVariable int id,@Valid @RequestBody Book updatedBook){
-        Book updatedBookResult = bookService.updateBook(id, updatedBook);
-        if(updatedBookResult != null){
-            return updatedBookResult;
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found.");
+    public Book updateBook(@PathVariable int id, @Valid @RequestBody Book updatedBook, Principal principal){
+        return bookService.updateBook(id, updatedBook, principal.getName());
     }
 }

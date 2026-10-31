@@ -16,32 +16,56 @@ import org.springframework.http.HttpStatus;
 class BookServiceTest{
 
     @Test
-    void updateMissingIdReturnsNull(){
+    void updateMissingIdThrows404(){
         BookRepository repo = mock(BookRepository.class);
-        when(repo.existsById(99)).thenReturn(false); //set up rule a head
+        when(repo.findById(99)).thenReturn(Optional.empty()); //set up rule a head
         BookService service = new BookService(repo, mock(UserRepository.class));
 
-        Book result = service.updateBook(99, new Book("Title", "Author", 2020, 9.99, true));
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.updateBook(99, new Book("Title", "Author", 2020, 9.99, true), "tam@test.com"));
 
-        assertNull(result);
-
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
         verify(repo,never()).save(any(Book.class));
     }
 
     @Test
-    void updateExistingIdSavesBook(){
+    void updateOwnBookCopiesFieldsAndKeepsSeller(){
         BookRepository repo = mock(BookRepository.class);
-        when(repo.existsById(1)).thenReturn(true); //set up rule a head
+        User tam = new User("Tam", "tam@test.com", "hash");
+        User minh = new User("Minh", "minh@test.com", "hash");
+        Book storedBook = new Book("Old", "Old Author", 2000, 1.0, true);
+        storedBook.setId(1);
+        storedBook.setSeller(tam); // Tam owns this book
+        when(repo.findById(1)).thenReturn(Optional.of(storedBook));
+        when(repo.save(storedBook)).thenReturn(storedBook); //set up rule a head
         BookService service = new BookService(repo, mock(UserRepository.class));
 
-        Book bookToUpdate = new Book("Title", "Author", 2020, 9.99, true);
-        when(repo.save(bookToUpdate)).thenReturn(bookToUpdate); //set up rule a head
+        Book changes = new Book("New", "New Author", 2020, 9.99, false);
+        changes.setSeller(minh); // client tries to hand the book to Minh
 
-        Book result = service.updateBook(1, bookToUpdate);
+        Book result = service.updateBook(1, changes, "tam@test.com");
 
-        assertNotNull(result);
+        assertEquals("New", result.getTitle());
+        assertEquals(9.99, result.getPrice(), 0.001);
         assertEquals(1, result.getId());
-        verify(repo, times(1)).save(bookToUpdate);
+        assertEquals(tam, result.getSeller());
+        verify(repo, times(1)).save(storedBook);
+    }
+
+    @Test
+    void updateOtherSellersBookThrows403(){
+        BookRepository repo = mock(BookRepository.class);
+        User tam = new User("Tam", "tam@test.com", "hash");
+        Book storedBook = new Book("Old", "Old Author", 2000, 1.0, true);
+        storedBook.setSeller(tam); // Tam owns this book
+        when(repo.findById(1)).thenReturn(Optional.of(storedBook));
+        BookService service = new BookService(repo, mock(UserRepository.class));
+
+        Book changes = new Book("Hacked", "Minh", 2020, 0.0, true);
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.updateBook(1, changes, "minh@test.com"));
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
+        assertEquals("Old", storedBook.getTitle());
+        verify(repo, never()).save(any(Book.class));
     }
 
     @Test 
