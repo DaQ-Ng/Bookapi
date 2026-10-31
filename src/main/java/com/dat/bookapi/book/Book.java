@@ -1,4 +1,6 @@
-package com.dat.bookapi;
+package com.dat.bookapi.book;
+
+import com.dat.bookapi.user.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
@@ -42,7 +44,7 @@ public class Book{
     public Book() {
     }
 
-    Book(String title, String author, int year, double price, boolean available){
+    public Book(String title, String author, int year, double price, boolean available){
         setTitle(title);
         setAuthor(author);
         setYear(year);

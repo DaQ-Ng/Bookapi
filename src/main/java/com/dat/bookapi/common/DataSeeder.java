@@ -1,4 +1,9 @@
-package com.dat.bookapi;
+package com.dat.bookapi.common;
+
+import com.dat.bookapi.book.Book;
+import com.dat.bookapi.book.BookRepository;
+import com.dat.bookapi.user.User;
+import com.dat.bookapi.user.UserRepository;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

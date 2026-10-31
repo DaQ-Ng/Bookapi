@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.order;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;

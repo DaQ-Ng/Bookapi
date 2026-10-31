@@ -1,4 +1,7 @@
-package com.dat.bookapi;
+package com.dat.bookapi.order;
+
+import com.dat.bookapi.book.Book;
+import com.dat.bookapi.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -30,7 +33,7 @@ public class Order{
 
     public Order(){}
 
-    Order(User buyer, Book purchasedBook, Double price){
+    public Order(User buyer, Book purchasedBook, Double price){
         setBuyer(buyer);
         setBook(purchasedBook);
         setPrice(price);

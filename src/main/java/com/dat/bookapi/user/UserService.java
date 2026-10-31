@@ -1,4 +1,6 @@
-package com.dat.bookapi;
+package com.dat.bookapi.user;
+
+import com.dat.bookapi.auth.LoginRequest;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;

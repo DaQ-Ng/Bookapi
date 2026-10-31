@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

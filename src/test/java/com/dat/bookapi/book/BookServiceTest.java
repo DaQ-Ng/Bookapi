@@ -1,4 +1,7 @@
-package com.dat.bookapi;
+package com.dat.bookapi.book;
+
+import com.dat.bookapi.user.User;
+import com.dat.bookapi.user.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -42,28 +45,44 @@ class BookServiceTest{
     }
 
     @Test 
-    void deleteMissingIdReturnsNull(){
+    void deleteMissingIdThrows404(){
         BookRepository repo = mock(BookRepository.class);
         when(repo.findById(99)).thenReturn(Optional.empty()); //set up rule a head
         BookService service = new BookService(repo, mock(UserRepository.class));
 
-        Book result = service.deleteBook(99);
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.deleteBook(99, "tam@test.com"));
 
-        assertNull(result);
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
         verify(repo, never()).deleteById(anyInt());
     }
 
     @Test 
     void deleteExistingIdReturnsBook(){
         BookRepository repo = mock(BookRepository.class);
+        User tam = new User("Tam", "tam@test.com", "hash");
         Book bookToDelete = new Book("Title", "Author", 2020, 9.99, true);
+        bookToDelete.setSeller(tam); // Tam owns this book
         when(repo.findById(1)).thenReturn(Optional.of(bookToDelete));
         BookService service = new BookService(repo, mock(UserRepository.class));
 
-        Book result = service.deleteBook(1);
+        Book result = service.deleteBook(1, "tam@test.com");
 
         assertEquals(bookToDelete, result);
         verify(repo, times(1)).deleteById(1);
+    }
+
+    @Test 
+    void deleteOtherSellersBookThrows403(){
+        BookRepository repo = mock(BookRepository.class);
+        User tam = new User("Tam", "tam@test.com", "hash");
+        Book bookToDelete = new Book("Title", "Author", 2020, 9.99, true);
+        bookToDelete.setSeller(tam); // Tam owns this book
+        when(repo.findById(1)).thenReturn(Optional.of(bookToDelete));
+        BookService service = new BookService(repo, mock(UserRepository.class));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.deleteBook(1, "minh@test.com"));
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
+        verify(repo, never()).deleteById(anyInt());
     }
 
     @Test

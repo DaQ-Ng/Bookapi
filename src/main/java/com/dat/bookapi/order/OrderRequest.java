@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.order;
 import jakarta.validation.constraints.NotNull;
 
 public class OrderRequest{
@@ -9,7 +9,7 @@ public class OrderRequest{
 
     public OrderRequest(){}
 
-    OrderRequest(Integer buyerId, Integer bookId){
+    public OrderRequest(Integer buyerId, Integer bookId){
         setBuyerId(buyerId);
         setBookId(bookId);
     }

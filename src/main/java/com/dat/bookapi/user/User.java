@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.user;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +24,7 @@ public class User{
 
     public User(){}
 
-    User(String name, String email, String password){
+    public User(String name, String email, String password){
         setName(name);
         setEmail(email);
         setPassword(password);

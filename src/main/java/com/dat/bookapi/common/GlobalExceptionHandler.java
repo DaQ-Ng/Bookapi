@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.common;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;

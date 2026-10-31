@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.auth;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest{
@@ -9,7 +9,7 @@ public class LoginRequest{
 
     public LoginRequest(){}
 
-    LoginRequest(String email, String password){
+    public LoginRequest(String email, String password){
         setEmail(email);
         setPassword(password);
     }

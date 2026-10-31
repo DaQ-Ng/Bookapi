@@ -1,4 +1,7 @@
-package com.dat.bookapi;
+package com.dat.bookapi.book;
+
+import com.dat.bookapi.user.User;
+import com.dat.bookapi.user.UserRepository;
 
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -32,13 +35,13 @@ public class BookService{
         return bookRepository.findById(id).orElse(null);
     }
 
-    public Book deleteBook(int id){
-        Book bookToDelete = bookRepository.findById(id).orElse(null);
-        if(bookToDelete != null){
-            bookRepository.deleteById(id);
-            return bookToDelete;
+    public Book deleteBook(int id, String email){
+        Book bookToDelete = bookRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book does not exist"));
+        if(!bookToDelete.getSeller().getEmail().equalsIgnoreCase(email)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own books.");
         }
-        return null; // Book not found
+        bookRepository.deleteById(id);
+        return bookToDelete;
     }
 
     public Book updateBook(int id, Book updatedBook){

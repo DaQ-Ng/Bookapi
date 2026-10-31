@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.auth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;

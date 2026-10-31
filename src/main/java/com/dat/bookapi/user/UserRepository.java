@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.user;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

@@ -1,4 +1,6 @@
-package com.dat.bookapi;
+package com.dat.bookapi.order;
+
+import com.dat.bookapi.book.Book;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

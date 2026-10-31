@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.book;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,12 +45,8 @@ public class BookController{
     }
 
     @DeleteMapping("/books/{id}")
-    public Book deleteBook(@PathVariable int id){
-        Book deletedBook = bookService.deleteBook(id);
-        if(deletedBook != null){
-            return deletedBook;
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found.");
+    public Book deleteBook(@PathVariable int id, Principal principal){
+        return bookService.deleteBook(id, principal.getName());
     }
 
     @PutMapping("/books/{id}")

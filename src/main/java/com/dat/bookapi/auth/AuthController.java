@@ -1,4 +1,7 @@
-package com.dat.bookapi;
+package com.dat.bookapi.auth;
+
+import com.dat.bookapi.user.User;
+import com.dat.bookapi.user.UserService;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;

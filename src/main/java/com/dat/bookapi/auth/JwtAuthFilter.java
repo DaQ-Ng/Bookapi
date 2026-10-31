@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.auth;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

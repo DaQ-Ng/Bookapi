@@ -1,4 +1,4 @@
-package com.dat.bookapi;
+package com.dat.bookapi.review;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
