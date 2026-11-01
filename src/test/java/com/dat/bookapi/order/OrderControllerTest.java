@@ -25,12 +25,13 @@ class OrderControllerTest{
 
     @Test
     void postOrderLostRaceReturn409() throws Exception{
-        when(orderService.placeOrder(any())).thenThrow(new ObjectOptimisticLockingFailureException(Book.class, 6));
+        when(orderService.placeOrder(any(), any())).thenThrow(new ObjectOptimisticLockingFailureException(Book.class, 6));
 
         String json = """
-            {"buyerId": 2, "bookId": 6}
+            {"bookId": 6}
         """;
 
-        mockMvc.perform(post("/orders").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isConflict());
+        // @WebMvcTest has no security filter, so we hand the controller a logged-in user ourselves
+        mockMvc.perform(post("/orders").principal(() -> "minh@test.com").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isConflict());
     }
 }

@@ -20,17 +20,21 @@ public class OrderService{
         this.userRepository = userRepository;
     }
 
-    private User getUserById(int id){
-        return userRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+    private User getUserByEmail(String email){
+        return userRepository.findByEmailIgnoreCase(email).orElseThrow(()-> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
     }
 
     private Book getBookById(int id){
         return bookRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found."));
     }
 
-    public Order placeOrder(OrderRequest request){
-        User buyer = getUserById(request.getBuyerId());
+    public Order placeOrder(OrderRequest request, String email){
+        User buyer = getUserByEmail(email);
         Book book = getBookById(request.getBookId());
+
+        if(book.getSeller() != null && book.getSeller().getEmail().equalsIgnoreCase(email)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot buy your own book.");
+        }
 
         if(!book.isAvailable()){
            throw new ResponseStatusException(HttpStatus.CONFLICT, "Book already sold.");

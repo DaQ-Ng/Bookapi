@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
+import java.security.Principal;
 
 @RestController
 public class OrderController{
@@ -14,7 +15,7 @@ public class OrderController{
     }
 
     @PostMapping("/orders")
-    public Order placeOrder(@Valid @RequestBody OrderRequest request){
-        return orderService.placeOrder(request);
+    public Order placeOrder(@Valid @RequestBody OrderRequest request, Principal principal){
+        return orderService.placeOrder(request, principal.getName());
     }
 }

@@ -3,27 +3,16 @@ import jakarta.validation.constraints.NotNull;
 
 public class OrderRequest{
     @NotNull
-    private Integer buyerId;
-    @NotNull
     private Integer bookId;
 
     public OrderRequest(){}
 
-    public OrderRequest(Integer buyerId, Integer bookId){
-        setBuyerId(buyerId);
+    public OrderRequest(Integer bookId){
         setBookId(bookId);
-    }
-
-    public void setBuyerId(Integer buyerId){
-        this.buyerId = buyerId;
     }
 
     public void setBookId(Integer bookId){
         this.bookId = bookId;
-    }
-
-    public Integer getBuyerId(){
-        return buyerId;
     }
 
     public Integer getBookId(){
