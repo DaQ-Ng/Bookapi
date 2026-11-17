@@ -29,6 +29,7 @@ public class SecurityConfig{
                 .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/books", "/books/*", "/reviews", "/hello").permitAll()
                 .requestMatchers("/error").permitAll() // Spring's own error page
+                .requestMatchers(HttpMethod.GET, "/", "/index.html", "/app.js", "/style.css").permitAll() // the frontend files in resources/static
                 .anyRequest().authenticated()) // everything else needs a valid token
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))) // no token → 401 (default would be 403)
             .addFilterBefore(new JwtAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class); // our check runs early in the chain

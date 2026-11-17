@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; margin: 0; background: #f6f5f2; color: #222; }
+header { display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: #2b3a55; color: white; }
+header h1 { font-size: 20px; margin: 0; flex: 1; }
+main { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; padding: 24px; max-width: 1100px; margin: 0 auto; }
+section { background: white; border-radius: 10px; padding: 16px 20px; border: 1px solid #ddd; }
+h2 { font-size: 16px; margin: 8px 0 12px; }
+form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+input { padding: 8px; border: 1px solid #bbb; border-radius: 6px; flex: 1 1 140px; }
+button { padding: 8px 14px; border: none; border-radius: 6px; background: #2b3a55; color: white; cursor: pointer; }
+button:disabled { background: #999; cursor: default; }
+ul { list-style: none; padding: 0; margin: 0; }
+li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+.meta { color: #666; font-size: 14px; }
+.pager { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+#message { max-width: 1100px; margin: 16px auto 0; padding: 10px 16px; border-radius: 6px; }
+#message.error { background: #fde8e8; color: #8a1f1f; }
+#message.ok { background: #e6f4ea; color: #1e5b2f; }
+@media (max-width: 760px) { main { grid-template-columns: 1fr; padding: 16px; } }
