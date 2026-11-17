@@ -1,0 +1,47 @@
+# Runs all tests on every push and pull request. Result shows as ✅/❌ next to each commit on GitHub.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # a throwaway Postgres just for this run (contextLoads starts the whole app, so it needs a DB)
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: bookdb
+          POSTGRES_USER: bookuser
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U bookuser -d bookdb"
+          --health-interval 3s
+          --health-retries 10
+
+    env:
+      DB_PASSWORD: ci-only-password
+      SHOW_SQL: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven            # reuse downloaded dependencies between runs
+
+      # a fresh random JWT key each run, so no secret lives in the repo
+      - name: Make a test JWT secret
+        run: echo "JWT_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
+
+      - name: Run tests
+        run: |
+          chmod +x mvnw
+          ./mvnw -B test

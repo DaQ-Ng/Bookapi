@@ -1,0 +1,31 @@
+# `docker compose up --build` → starts Postgres + the app together.
+# DB_PASSWORD and JWT_SECRET come from your shell (they're already in ~/.bashrc).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: bookdb
+      POSTGRES_USER: bookuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - bookdb-data:/var/lib/postgresql/data   # data survives `docker compose down`
+    healthcheck:                               # "ready" = Postgres accepts connections
+      test: ["CMD-SHELL", "pg_isready -U bookuser -d bookdb"]
+      interval: 3s
+      retries: 10
+    # no ports: section → only the app can reach it (and it won't clash with WSL's Postgres on 5432)
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"                            # your browser → localhost:8080 → the container
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/bookdb # "db" = the service name above, Docker's own DNS
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy             # wait for Postgres before starting Spring
+
+volumes:
+  bookdb-data:

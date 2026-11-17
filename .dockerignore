@@ -1,0 +1,9 @@
+# files Docker shouldn't copy into the build (faster builds, no secrets)
+target
+.git
+.github
+.vscode
+.idea
+*.md
+*.svg
+.env
