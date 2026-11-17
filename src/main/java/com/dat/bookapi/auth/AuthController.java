@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.security.Principal;
 
 @RestController
 public class AuthController{
@@ -28,5 +30,11 @@ public class AuthController{
         User user = userService.login(login);
         String token = jwtService.generateToken(user.getEmail());
         return new LoginResponse(token);
+    }
+
+    // not in the permitAll list → needs a token; returns {id, name} (email + password are WRITE_ONLY)
+    @GetMapping("/auth/me")
+    public User me(Principal principal){
+        return userService.getByEmail(principal.getName());
     }
 }

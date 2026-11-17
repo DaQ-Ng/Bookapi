@@ -51,13 +51,14 @@
 
         <!-- 3. Sell + my orders: shown only when logged in -->
         <section id="member-section" hidden>
-            <h2>Sell a book</h2>
+            <h2 id="sell-heading">Sell a book</h2>
             <form id="sell-form">
                 <input id="sell-title" placeholder="Title" required>
                 <input id="sell-author" placeholder="Author" required>
                 <input id="sell-year" type="number" placeholder="Year" required>
                 <input id="sell-price" type="number" step="0.01" placeholder="Price" required>
-                <button>List it</button>
+                <button id="sell-submit">List it</button>
+                <button type="button" id="cancel-edit" class="secondary" hidden>Cancel</button>
             </form>
 
             <h2>My orders</h2>

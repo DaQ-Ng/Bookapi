@@ -1,6 +1,8 @@
 // ---------- state ----------
 // the JWT from /auth/login; kept in localStorage so a page refresh doesn't log you out
 let token = localStorage.getItem("token");
+let me = null;          // {id, name} from GET /auth/me, used to spot "my" books
+let editingId = null;   // id of the book being edited, or null when the form is in "sell" mode
 let page = 0;           // current page of /books (Spring pages start at 0)
 const PAGE_SIZE = 5;
 
@@ -55,11 +57,6 @@ function listItem(mainText, metaText) {
     return li;
 }
 
-// the token's middle part is Base64 JSON (readable, not secret): {"sub": email, "iat", "exp"}
-function emailFromToken(t) {
-    try { return JSON.parse(atob(t.split(".")[1])).sub; } catch { return null; }
-}
-
 // ---------- books (public) ----------
 async function loadBooks() {
     const title = document.getElementById("search-title").value;
@@ -79,10 +76,18 @@ async function loadBooks() {
         const li = listItem(book.title + " by " + book.author,
             book.year + " · $" + book.price.toFixed(2) + " · sold by " + seller);
 
-        const buyBtn = document.createElement("button");
-        buyBtn.textContent = "Buy";
-        buyBtn.onclick = safe(() => buyBook(book.id));   // errors (403 own book, 409 sold) show in the message box
-        li.append(buyBtn);
+        // my book → Edit + Remove; anyone else's → Buy (the server still checks: this is only for display)
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        const isMine = me && book.seller && book.seller.id === me.id;
+        if (isMine) {
+            actions.append(
+                makeButton("Edit", "secondary", () => startEdit(book)),
+                makeButton("Remove", "danger", () => removeBook(book)));
+        } else {
+            actions.append(makeButton("Buy", "", () => buyBook(book.id)));   // errors (403 own book, 409 sold) show in the message box
+        }
+        li.append(actions);
         list.append(li);
     }
 
@@ -92,29 +97,50 @@ async function loadBooks() {
     document.getElementById("next-btn").disabled = page + 1 >= totalPages;
 }
 
+function makeButton(text, className, onClick) {
+    const btn = document.createElement("button");
+    btn.textContent = text;
+    btn.className = className;
+    btn.onclick = safe(onClick);
+    return btn;
+}
+
 // ---------- auth ----------
 async function login(email, password) {
     const data = await api("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
     token = data.token;
     localStorage.setItem("token", token);
-    updateAuthUI();
+    await refresh();
     showMessage("Logged in.", "ok");
 }
 
 function logout() {
     token = null;
+    me = null;
     localStorage.removeItem("token");
+    cancelEdit();
     updateAuthUI();
+    loadBooks().catch(err => showMessage(err.message, "error"));   // redraw: Edit/Remove buttons become Buy
 }
 
-// shows/hides sections depending on whether we hold a token
+// shows/hides sections depending on whether we know who you are
 function updateAuthUI() {
-    const loggedIn = !!token;
+    const loggedIn = !!me;
     document.getElementById("auth-section").hidden = loggedIn;
     document.getElementById("member-section").hidden = !loggedIn;
     document.getElementById("logout-btn").hidden = !loggedIn;
-    document.getElementById("who").textContent = loggedIn ? "Logged in as " + emailFromToken(token) : "Not logged in";
-    if (loggedIn) loadOrders().catch(err => showMessage(err.message, "error"));
+    document.getElementById("who").textContent = loggedIn ? "Logged in as " + me.name : "Not logged in";
+}
+
+// ask the server who the token belongs to, then redraw everything
+async function refresh() {
+    if (token) {
+        try { me = await api("/auth/me"); }
+        catch { me = null; }                   // expired token → api() already logged us out
+    }
+    updateAuthUI();
+    await loadBooks();
+    if (me) await loadOrders();
 }
 
 // ---------- logged-in actions ----------
@@ -145,6 +171,43 @@ async function sellBook(book) {
     await loadBooks();
 }
 
+// PUT /books/{id}: the server copies these fields onto the stored book (seller stays you)
+async function saveEdit(book) {
+    const saved = await api("/books/" + editingId, { method: "PUT", body: JSON.stringify(book) });
+    showMessage("Saved " + saved.title + ".", "ok");
+    cancelEdit();
+    await loadBooks();
+}
+
+async function removeBook(book) {
+    if (!confirm("Remove \"" + book.title + "\"? This can't be undone.")) return;
+    await api("/books/" + book.id, { method: "DELETE" });
+    showMessage("Removed " + book.title + ".", "ok");
+    if (editingId === book.id) cancelEdit();
+    await loadBooks();
+}
+
+// the sell form doubles as the edit form: fill it in and switch the labels
+function startEdit(book) {
+    editingId = book.id;
+    document.getElementById("sell-title").value = book.title;
+    document.getElementById("sell-author").value = book.author;
+    document.getElementById("sell-year").value = book.year;
+    document.getElementById("sell-price").value = book.price;
+    document.getElementById("sell-heading").textContent = "Edit \"" + book.title + "\"";
+    document.getElementById("sell-submit").textContent = "Save changes";
+    document.getElementById("cancel-edit").hidden = false;
+    document.getElementById("sell-title").focus();
+}
+
+function cancelEdit() {
+    editingId = null;
+    document.getElementById("sell-form").reset();
+    document.getElementById("sell-heading").textContent = "Sell a book";
+    document.getElementById("sell-submit").textContent = "List it";
+    document.getElementById("cancel-edit").hidden = true;
+}
+
 // ---------- wire up the forms ----------
 // every handler: stop the browser's own form submit (page reload), call the API, show any error
 function onSubmit(formId, handler) {
@@ -171,13 +234,19 @@ onSubmit("register-form", async (form) => {
     form.reset();
 });
 
-onSubmit("sell-form", (form) => sellBook({
-    title: document.getElementById("sell-title").value,
-    author: document.getElementById("sell-author").value,
-    year: Number(document.getElementById("sell-year").value),
-    price: Number(document.getElementById("sell-price").value),
-    available: true
-}).then(() => form.reset()));
+// same form, two jobs: POST a new book, or PUT the one being edited
+onSubmit("sell-form", (form) => {
+    const book = {
+        title: document.getElementById("sell-title").value,
+        author: document.getElementById("sell-author").value,
+        year: Number(document.getElementById("sell-year").value),
+        price: Number(document.getElementById("sell-price").value),
+        available: true
+    };
+    if (editingId) return saveEdit(book);
+    return sellBook(book).then(() => form.reset());
+});
+document.getElementById("cancel-edit").onclick = cancelEdit;
 
 // buttons outside forms catch their own errors
 function safe(fn) { return () => fn().catch(err => showMessage(err.message, "error")); }
@@ -186,5 +255,4 @@ document.getElementById("next-btn").onclick = safe(() => { page++; return loadBo
 document.getElementById("logout-btn").onclick = () => { logout(); showMessage("Logged out.", "ok"); };
 
 // ---------- start ----------
-updateAuthUI();
-safe(loadBooks)();
+safe(refresh)();

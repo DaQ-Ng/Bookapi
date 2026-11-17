@@ -31,4 +31,9 @@ public class UserService{
         }
         return user;
     }
+
+    // "who am I?" for the logged-in user; 401 if the token's user was deleted
+    public User getByEmail(String email){
+        return userRepository.findByEmailIgnoreCase(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
+    }
 }

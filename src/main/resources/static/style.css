@@ -9,6 +9,9 @@ form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 input { padding: 8px; border: 1px solid #bbb; border-radius: 6px; flex: 1 1 140px; }
 button { padding: 8px 14px; border: none; border-radius: 6px; background: #2b3a55; color: white; cursor: pointer; }
 button:disabled { background: #999; cursor: default; }
+button.secondary { background: white; color: #2b3a55; border: 1px solid #2b3a55; }
+button.danger { background: #a83232; }
+.actions { display: flex; gap: 6px; }
 ul { list-style: none; padding: 0; margin: 0; }
 li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
 .meta { color: #666; font-size: 14px; }
