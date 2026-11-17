@@ -37,7 +37,7 @@ public class BookService{
 
     public Book deleteBook(int id, String email){
         Book bookToDelete = bookRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book does not exist"));
-        if(!bookToDelete.getSeller().getEmail().equalsIgnoreCase(email)){
+        if(!isSeller(bookToDelete, email)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own books.");
         }
         bookRepository.deleteById(id);
@@ -46,7 +46,7 @@ public class BookService{
 
     public Book updateBook(int id, Book updatedBook, String email){
         Book bookToUpdate = bookRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book does not exist"));
-        if(!bookToUpdate.getSeller().getEmail().equalsIgnoreCase(email)){
+        if(!isSeller(bookToUpdate, email)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only edit your own books.");
         }
         // copy only the fields a seller may change; id, seller and version stay from the DB
@@ -56,6 +56,11 @@ public class BookService{
         bookToUpdate.setPrice(updatedBook.getPrice());
         bookToUpdate.setAvailable(updatedBook.isAvailable());
         return bookRepository.save(bookToUpdate);
+    }
+
+    // a book with no seller (made before auth) belongs to nobody → nobody may edit/delete it (403, not a 500 NPE)
+    private boolean isSeller(Book book, String email){
+        return book.getSeller() != null && book.getSeller().getEmail().equalsIgnoreCase(email);
     }
 
     public Page<Book> searchBooks(String title, Pageable pageable){

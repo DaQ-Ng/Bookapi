@@ -110,6 +110,30 @@ class BookServiceTest{
     }
 
     @Test
+    void deleteBookWithoutSellerThrows403(){
+        BookRepository repo = mock(BookRepository.class);
+        Book oldBook = new Book("Dune", "Herbert", 1965, 9.99, true); // seller = null, made before auth
+        when(repo.findById(6)).thenReturn(Optional.of(oldBook));
+        BookService service = new BookService(repo, mock(UserRepository.class));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.deleteBook(6, "tam@test.com"));
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode()); // was a NullPointerException → 500
+        verify(repo, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void updateBookWithoutSellerThrows403(){
+        BookRepository repo = mock(BookRepository.class);
+        Book oldBook = new Book("Dune", "Herbert", 1965, 9.99, true);
+        when(repo.findById(6)).thenReturn(Optional.of(oldBook));
+        BookService service = new BookService(repo, mock(UserRepository.class));
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.updateBook(6, new Book("X", "Y", 2020, 1.0, true), "tam@test.com"));
+        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
+        verify(repo, never()).save(any(Book.class));
+    }
+
+    @Test
     void getMissingIdReturnNull(){
         BookRepository repo = mock(BookRepository.class);
         when(repo.findById(99)).thenReturn(Optional.empty());

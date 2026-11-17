@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import java.util.List;
 
 @WebMvcTest(OrderController.class)
 class OrderControllerTest{
@@ -33,5 +35,12 @@ class OrderControllerTest{
 
         // @WebMvcTest has no security filter, so we hand the controller a logged-in user ourselves
         mockMvc.perform(post("/orders").principal(() -> "minh@test.com").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isConflict());
+    }
+
+    @Test
+    void getOrdersNoOrdersReturns200EmptyList() throws Exception{
+        when(orderService.getMyOrders("tam@test.com")).thenReturn(List.of());
+
+        mockMvc.perform(get("/orders").principal(() -> "tam@test.com")).andExpect(status().isOk()).andExpect(content().json("[]"));
     }
 }

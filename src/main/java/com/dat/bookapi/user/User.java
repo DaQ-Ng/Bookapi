@@ -17,6 +17,7 @@ public class User{
     @NotBlank
     private String name;
     @NotBlank
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // read on register, never shown in responses (seller emails were public in GET /books)
     private String email;
     @NotBlank
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

@@ -7,6 +7,7 @@ import com.dat.bookapi.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import java.util.List;
 
 @Service
 public class OrderService{
@@ -45,5 +46,10 @@ public class OrderService{
 
         bookRepository.save(book);
         return orderRepository.save(new Order(buyer, book, book.getPrice()));
+    }
+
+    // only the orders where the logged-in user is the buyer; none → empty list (200 [])
+    public List<Order> getMyOrders(String email){
+        return orderRepository.findByBuyerEmailIgnoreCaseOrderByCreatedAtDesc(email);
     }
 }

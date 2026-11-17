@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Optional;
+import java.util.List;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -83,5 +84,29 @@ class OrderServiceTest{
         Order result = service.placeOrder(new OrderRequest(6), "minh@test.com");
 
         assertEquals(minh, result.getBuyer());
+    }
+
+    @Test
+    void getMyOrdersAsksRepoForThisEmailOnly(){
+        OrderRepository orderRepo = mock(OrderRepository.class);
+        User minh = new User("Minh", "minh@test.com", "hash");
+        Order order = new Order(minh, new Book("Title", "Author", 2020, 9.99, false), 9.99);
+        when(orderRepo.findByBuyerEmailIgnoreCaseOrderByCreatedAtDesc("minh@test.com")).thenReturn(List.of(order));
+        OrderService service = new OrderService(orderRepo, mock(BookRepository.class), mock(UserRepository.class));
+
+        List<Order> result = service.getMyOrders("minh@test.com");
+
+        assertEquals(List.of(order), result);
+    }
+
+    @Test
+    void getMyOrdersNoOrdersReturnsEmptyList(){
+        OrderRepository orderRepo = mock(OrderRepository.class);
+        when(orderRepo.findByBuyerEmailIgnoreCaseOrderByCreatedAtDesc("tam@test.com")).thenReturn(List.of());
+        OrderService service = new OrderService(orderRepo, mock(BookRepository.class), mock(UserRepository.class));
+
+        List<Order> result = service.getMyOrders("tam@test.com");
+
+        assertEquals(0, result.size()); // empty list, not null → controller sends 200 []
     }
 }
